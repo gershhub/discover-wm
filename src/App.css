@@ -1,0 +1,177 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+#mainMaps{
+  margin: auto;
+  width: 95%;
+}
+
+#chartContainer{
+  width: 600px;
+  float: left;
+  clear:left;
+}
+
+.rangeSlider{
+  width: 99%;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.mapmove-button {background-color: #363636; color: #b3b3b3;} 
+
+.rangeSlider:hover {
+  opacity: 1;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+}
+
+h2{
+  color: #c5c5c5;
+  margin-left: 1em;
+}
+
+p{
+  color: #b3b3b3;
+}
+
+#mapContainer{
+  margin-left: 20px;
+  float: left;
+}
+
+body {
+  background-color: black;
+}
+
+#audioControls{
+  margin-top: 30px;
+  width: 1220px;
+  float: left;
+  clear:left;
+}
+
+#fileActivity{
+  float: left;
+  clear:left;
+  color:#b3b3b3;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color:#b3b3b3;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.row-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+div {
+  font-size: 10px;
+  margin: 3px;
+  margin-top: 10px;
+}
+
+button {
+  font-size: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border: none;
+  text-decoration: none;
+  background-color: #363636; 
+  color: #b3b3b3;
+  vertical-align: middle;
+}
+
+button:hover{
+  color: #ffffff;
+}
+
+.form-control {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.range-slider {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#mode-control{
+  background-color:  #000000;
+  color: #ffffff;
+}
+
+#range-control{
+  background-color:  #000000;
+  color: #ffffff;
+}
+
+#logging-control{
+  background-color:  #000000;
+  color: #ffffff;
+  margin-top: 50px;
+}
+
+.base-button{
+  background-color:  #000000;
+  color: #ffffff;
+}
+
+.selected-button{
+  background-color:  #000000;
+  color: #ffffff;
+}
+
+select option {
+  background:black;
+  color: #b3b3b3;
+}
+
+select{
+  margin-top: 30px;
+  margin-left: 5px;
+  background:black;
+  color: #b3b3b3;
+}
+
+label{
+  color: #b3b3b3;
+}
