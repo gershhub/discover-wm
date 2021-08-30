@@ -142,9 +142,9 @@ class AudioPlayer extends React.Component {
       const index = this.state.playing[trackName];
       this.voices[index].audioElement.currentTime = currentTime;
 
-      // setTimeout(() => {
-      //   this.setTime(trackName, currentTimeIndex);
-      // }, this.state.loopLength + Math.floor(Math.random() * 10));
+    //   setTimeout(() => {
+    //     this.setTime(trackName, currentTimeIndex);
+    //   }, this.state.loopLength + Math.floor(Math.random() * 5));
     }
   }
 

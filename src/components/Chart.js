@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
-import { rgb } from "d3-color";
 import { connect } from "react-redux";
 import { setAudio, setTrack } from "../redux/actions";
 import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
@@ -26,6 +25,7 @@ class Chart extends Component {
     this.changeComponents = this.changeComponents.bind(this);
     this.mouseOverTooltipHandler = this.mouseOverTooltipHandler.bind(this);
     this.addNodeToPath = this.addNodeToPath.bind(this);
+    this.addScaledNodeToPath = this.addScaledNodeToPath.bind(this);
     this.resetPathHandler = this.resetPathHandler.bind(this);
     this.moveAlongPath = this.moveAlongPath.bind(this);
     this.makeButton = this.makeButton.bind(this);
@@ -40,7 +40,7 @@ class Chart extends Component {
     this.updateMapScale = this.updateMapScale.bind(this);
     this.updateSeletedRect = this.updateSeletedRect.bind(this);
     this.updateMap = this.updateMap.bind(this);
-    this.addComponentSelector = this.addMapSelector.bind(this);
+    // this.addComponentSelector = this.addMapSelector.bind(this);
     this.addSlider = this.addSlider.bind(this);
     this.addKeyNavigator = this.addKeyNavigator.bind(this);
     this.addCoordForm = this.addCoordForm.bind(this);
@@ -52,14 +52,14 @@ class Chart extends Component {
     const audibleRange = visibleRange * 0.1;
     // default state
     this.state = {
-      map: this.props.files[0],
+      // map: this.props.files[0],
       xAxisComponent: 0,
       yAxisComponent: 1,
       mode: "MANUAL",
       dragStarted: false,
-      playPathSpeed: 1,
-      xMap: 0.5,
-      yMap: 0.5,
+      playPathSpeed: 10,
+      xMap: this.props.startingpoint[0],
+      yMap: this.props.startingpoint[1],
       xSelected: 0,
       ySelected: 0,
       visibleRange: visibleRange,
@@ -93,7 +93,7 @@ class Chart extends Component {
     const SAMPLES_PER_TILE = 1000;
     const nEmbeddings = this.props.data.length;
     const nTiles = nEmbeddings / SAMPLES_PER_TILE;
-    return 1 / nTiles;
+    return 2 / nTiles;
   }
 
   updateChartScale() {
@@ -103,6 +103,25 @@ class Chart extends Component {
       const viewMax = offset + visibleRange * 0.5;
       return d3.scaleLinear().domain([viewMin, viewMax]).range([0, pixels]);
     };
+
+    const getScaleUp = (pixels, offset, visibleRange) => {
+      // get embeddings as list
+      const viewMin = offset - visibleRange * 0.5;
+      const viewMax = offset + visibleRange * 0.5;
+      return d3.scaleLinear().domain([0, pixels]).range([viewMin, viewMax]);
+    };
+
+    this.xScaleUp = getScaleUp(
+      this.props.width,
+      this.state.xMap,
+      this.state.visibleRange
+    )
+
+    this.yScaleUp = getScaleUp(
+      this.props.width,
+      this.state.yMap,
+      this.state.visibleRange
+    )
 
     this.xScale = getScale(
       this.props.width,
@@ -366,6 +385,8 @@ class Chart extends Component {
       }
       case "MAKEPATH": {
         this.addNodeToPath(e.offsetX, e.offsetY);
+        // this.addScaledNodeToPath(this.xScaleUp(e.offsetX), this.yScaleUp(e.offsetY));
+        console.log(this.xScaleUp(e.offsetX));
         return;
       }
       case "PLAYTRACK": {
@@ -374,6 +395,20 @@ class Chart extends Component {
       }
       default:
         return;
+    }
+  }
+
+  mouseMapDownHandler(e) {
+    if(e.shiftKey){
+      console.log("MOUSE DOWN", e.offsetX/600, e.offsetY/600);
+      this.setState({
+        ...this.state,
+        xSelected: e.offsetX/600,
+      })
+      this.setState({
+        ...this.state,
+        ySelected: e.offsetY/600,
+      })
     }
   }
 
@@ -464,10 +499,39 @@ class Chart extends Component {
     }
   }
 
+  addScaledNodeToPath(x, y) {
+    // add node
+    this.svg
+      .append("rect")
+      .attr("class", "node")
+      .attr("x", this.xScale.invert(x))
+      .attr("y", this.yScale.invert(y))
+      .attr("height", 5)
+      .attr("width", 5)
+      .style("stroke", "black")
+      .style("fill", "none")
+      .style("stroke-width", "1px");
+    // add node to list
+    this.path.push([x, y]);
+    // add line
+    const i1 = this.path.length - 1;
+    const i2 = this.path.length - 2;
+    if (this.path.length > 1) {
+      this.svg
+        .append("line")
+        .attr("class", "line")
+        .attr("x1", this.xScale(this.path[i1][0]))
+        .attr("y1", this.yScale(this.path[i1][1]))
+        .attr("x2", this.xScale(this.path[i2][0]))
+        .attr("y2", this.yScale(this.path[i2][1]))
+        .attr("stroke", "red");
+    }
+  }
+
   resetPathHandler() {
     this.setState({
       ...this.state,
-      mode: "MAKEPATH",
+      mode: "MANUAL",
     });
     this.svg.selectAll(".line").remove();
     this.svg.selectAll(".node").remove();
@@ -559,7 +623,7 @@ class Chart extends Component {
       .attr("y", 0)
       .attr("height", h)
       .attr("width", w)
-      .style("stroke", "black")
+      .style("stroke", "white")
       .style("fill", "none")
       .style("stroke-width", "1px");
 
@@ -600,7 +664,8 @@ class Chart extends Component {
       .append("svg")
       .attr("width", this.MAP_WIDTH)
       .attr("height", this.MAP_HEIGHT)
-      .style("style", "outline: thin solid black;");
+      .style("style", "outline: thin solid black;")
+      .on("mousedown", () => this.mouseMapDownHandler(d3.event));
 
       this.map.append("rect")
       .attr("width", "100%")
@@ -622,7 +687,7 @@ class Chart extends Component {
       .attr("y", 0)
       .attr("height", this.MAP_HEIGHT)
       .attr("width", this.MAP_WIDTH)
-      .style("stroke", "black")
+      .style("stroke", "white")
       .style("fill", "none")
       .style("stroke-width", "1px");
 
@@ -706,22 +771,22 @@ class Chart extends Component {
     );
   }
 
-  addMapSelector() {
-    return (
-      <Form>
-        <Form.Label>Map:</Form.Label>
-        <Form.Control
-          as="select"
-          onChange={(e) => {
-            this.setState({ ...this.state, map: e.target.value });
-          }}
-        >
-          {Array.from(this.props.files).map(item => (
-            <option key={item}>{item}</option>
-          ))}
-        </Form.Control>
-      </Form>
-    )}
+  // addMapSelector() {
+  //   return (
+  //     <Form>
+  //       <Form.Label>Map:</Form.Label>
+  //       <Form.Control
+  //         as="select"
+  //         onChange={(e) => {
+  //           this.setState({ ...this.state, map: e.target.value });
+  //         }}
+  //       >
+  //         {Array.from(this.props.files).map(item => (
+  //           <option key={item}>{item}</option>
+  //         ))}
+  //       </Form.Control>
+  //     </Form>
+  //   )}
 
   addSlider(min, max, step, value, text) {
     return (
@@ -955,30 +1020,30 @@ class Chart extends Component {
           {this.addNavigator(this.mapMoveHandler, "Move area:")}
           {this.addKeyNavigator(this.moveButtonHandler)}
         </div>
-        <div id="logging-control" className="row-container">
-          <Button onClick={this.loggingHandler}>
-            {this.state.loggingStarted ? "Stop Log" : "Start Log"}
-          </Button>
-        </div>
         <div id="mode-control">
           {/* <p>Play Mode:</p> */}
           <div>
-            {/* {this.makeButton("MANUAL", "Manual")} */}
+            {this.makeButton("MANUAL", "Manual Mode")}
             {/* {this.state.dragStarted
               ? "Move mouse around to hear samples. Click to stop."
               : "Click anywhere to start."} */}
             {/* {this.addNavigator(this.moveButtonHandler, "Move selected area:")} */}
             {/* {this.addCoordForm()} */}
+            {this.makeButton("MAKEPATH", "Draw Path Mode")}
+            {this.makeButton("PLAYPATH", "Play Path Mode")}
+            <Button onClick={this.resetPathHandler}>Clear Path</Button>
           </div>
           <div>
-            {/* {this.makeButton("MAKEPATH", "Make Path")} */}
-            {/* {this.makeButton("PLAYPATH", "Play Path")} */}
-            {/* <Button onClick={this.resetPathHandler}>Reset</Button> */}
-            {/* {this.addSlider(1, 50, 1, "playPathSpeed", "Playing Speed:")} */}
+            {this.addSlider(10, 50, 1, "playPathSpeed", "Path Following Speed:")}
           </div>
           {/* <div>
             {this.makeButton("PLAYTRACK", "Play Track")} {this.props.leadTrack}
           </div> */}
+          <div id="logging-control" className="row-container">
+          <Button onClick={this.loggingHandler}>
+            {this.state.loggingStarted ? "Stop Log" : "Start Log"}
+          </Button>
+        </div>
         </div>
 
         {/* {this.addMapSelector()} */}

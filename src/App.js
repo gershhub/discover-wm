@@ -5,8 +5,9 @@ import AudioPlayer from "./components/AudioPlayer";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 
-import DATA from "./data/umap_sixteenth.json"
-var MAP_IMAGE = "umap_sixteenth"
+import DATA from "./data/umap2_pedion.json";
+var MAP_IMAGE = "umap2_pedion";
+var STARTING_POINT = [0.66944, 0.8356167];
 
 class App extends React.Component {
   constructor(props) {
@@ -32,7 +33,8 @@ class App extends React.Component {
           <div>
             <Chart
               data={this.state.data}
-              files={["nime","umap_eighth"]}
+              // startingpoint={[0.069,0.38]}
+              startingpoint={STARTING_POINT}
               map_image={MAP_IMAGE}
               width={this.state.chartWidth}
               height={this.state.chartHeight}
