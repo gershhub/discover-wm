@@ -2,9 +2,9 @@
 
 ## Web interface for exploring deep audio embeddings
 
-This project is a web audio interface for the Wandering Mind, built using React. At start, the application loads in a json-formated data file of 2d points corresponding to short audio clips, as well as a list of associated files. The short clips are accessed in the associated files by seeking to the index point  indicated in the json.
+This project is a web audio application that performs concatenative synthesis for the Wandering Mind. At start, Discover loads in a json data file of 2d points corresponding to short audio clips. The short clips are accessed in the associated files by seeking to the index point indicated in the json, and mixed with a roll-off curve according to the listener position and an audible range parameter.
 
-The project was commissioned by slow immediate. Development was led by Nan Zhao of Nayo, with feedback and adjustments from Gershon Dublon of slow immediate. The project was forked in March 2021 for research purposes with the team at DVIC.
+The project was conceived by slow immediate LLC for our project the Wandering Mind. Original software development was led by [Nan Zhao](https://github.com/nandev/), with input by Gershon Dublon. The project was forked and eventually spun off in March 2021 with substantial changes. As of summer 2021, the platform is in active use for artistic performances as well as for research purposes with the team at [DVIC](https://dvic.devinci.fr/).
 
 ## Running the application 
 
